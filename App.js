@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity } from 'react-native';
+import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions, Easing } from 'react-native';
 
 // DID SOME ANIMATION STUFF TO LEARN HOW TO ANIMATE
 // NEXT STEP: MAKE A GAME XD
@@ -11,6 +11,8 @@ export default class App extends Component {
     this.state = {
       fadeValue: new Animated.Value(0),
       width: new Animated.Value(100),
+      rotateX: 0,
+      rotateY: 0,
     };
   }
 
@@ -47,23 +49,44 @@ export default class App extends Component {
     });
   }
 
+  changeDirection = (evt) => {
+    /*let locX = evt.nativeEvent.locationX;
+    let locY = evt.nativeEvent.locationY;
+    let endpoint = Math.atan(locY / locX)
+    console.log(`locX: ${locX}, locY: ${locY}`)*/
+    let yukseklik = Dimensions.get('window').height;
+    let Yprime = evt.nativeEvent.locationX;
+    let Xprime = evt.nativeEvent.locationY;
+    console.log(Yprime/yukseklik * 360)
+
+    /*Animated.timing(this.state.rotate, {
+      toValue: locX/locY,
+      duration: 3000,
+      easing: Easing.linear
+    }).start();*/
+    this.setState({ rotateX: Yprime/yukseklik * 180 })
+  }
+
   render() {
     return (
-      <View style={styles.container}>
-        <Animated.View style={[styles.animationView,
+      <TouchableOpacity style={styles.container} onPress={(evt) => this.changeDirection(evt)}>
+        {/*<Animated.View style={[styles.animationView,
           { opacity: this.state.fadeValue }
           ]}>
-        </Animated.View>
+        </Animated.View>*/}
 
         <Animated.View style={[styles.animationView,
-          { width: this.state.width }
+          { width: this.state.width },
+          { transform:[ { rotateZ: (-this.state.rotateX) + 'deg' }] }
           ]}>
         </Animated.View>
 
-        <TouchableOpacity onPress={this.TwoFunctions}>
+        {/*<TouchableOpacity onPress={this._increaseWidth}>
           <Text style={styles.welcome}>Animate</Text>
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>*/}
+
+
+      </TouchableOpacity>
     );
   }
 }
@@ -71,8 +94,8 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    alignItems: 'center',
+    //justifyContent: 'center',
+    //alignItems: 'center', 
   },
   welcome: {
     fontSize: 20,
@@ -85,9 +108,16 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   animationView: {
-    width: 100,
-    height: 100,
-    backgroundColor: 'skyblue'
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 50,
+    borderRightWidth: 50,
+    borderBottomWidth: 100,
+    borderTopWidth: 100,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderTopColor: 'red',
   },
   button: {
     backgroundColor: 'steelblue',
