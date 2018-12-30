@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions, Easing } from 'react-native';
+import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions, Easing, TouchableWithoutFeedback } from 'react-native';
 
 // DID SOME ANIMATION STUFF TO LEARN HOW TO ANIMATE
 // NEXT STEP: MAKE A GAME XD
@@ -14,6 +14,8 @@ export default class App extends Component {
       rotateX: 0,
       rotateY: 0,
     };
+    this.timer = null;
+    this.stopFunction = this.stopFunction.bind(this);
   }
 
   TwoFunctions = () => {
@@ -49,6 +51,10 @@ export default class App extends Component {
     });
   }
 
+  stopFunction() {
+    clearTimeout(this.timer);
+  }
+
   changeDirection = (evt) => {
     /*let locX = evt.nativeEvent.locationX;
     let locY = evt.nativeEvent.locationY;
@@ -57,6 +63,7 @@ export default class App extends Component {
     let yukseklik = Dimensions.get('window').height;
     let Yprime = evt.nativeEvent.locationX;
     let Xprime = evt.nativeEvent.locationY;
+    console.log(evt)
     console.log(Yprime/yukseklik * 360)
 
     /*Animated.timing(this.state.rotate, {
@@ -65,11 +72,14 @@ export default class App extends Component {
       easing: Easing.linear
     }).start();*/
     this.setState({ rotateX: Yprime/yukseklik * 180 })
+    function = (evt) => console.log(evt.nativEvent)
+    //this.timer = setTimeout(this.changeDirection(evt), 200);
   }
 
   render() {
+    // TODO: find a way to rotate the shape while pressing
     return (
-      <TouchableOpacity style={styles.container} onPress={(evt) => this.changeDirection(evt)}>
+      <TouchableOpacity style={styles.container} onPressIn={(evt) => this.changeDirection(evt)} onPressOut={(evt) => this.changeDirection(evt)}>
         {/*<Animated.View style={[styles.animationView,
           { opacity: this.state.fadeValue }
           ]}>
