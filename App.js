@@ -4,6 +4,9 @@ import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions
 // DID SOME ANIMATION STUFF TO LEARN HOW TO ANIMATE
 // NEXT STEP: MAKE A GAME XD
 
+// https://www.khanacademy.org/partner-content/pixar/sets/rotation/e/rotating-a-point-around-the-origin-2
+// learn trigonometri on graphs better
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -13,6 +16,7 @@ export default class App extends Component {
       width: new Animated.Value(100),
       rotateX: 0,
       rotateY: 0,
+      oldValue: 0,
     };
     this.timer = null;
     this.stopFunction = this.stopFunction.bind(this);
@@ -63,21 +67,21 @@ export default class App extends Component {
     let yukseklik = Dimensions.get('window').height;
     let Yprime = evt.nativeEvent.locationX;
     let Xprime = evt.nativeEvent.locationY;
-    console.log(evt)
-    console.log(Yprime/yukseklik * 360)
 
     /*Animated.timing(this.state.rotate, {
       toValue: locX/locY,
       duration: 3000,
       easing: Easing.linear
     }).start();*/
-    this.setState({ rotateX: Yprime/yukseklik * 180 })
-    function = (evt) => console.log(evt.nativEvent)
+
+    this.setState({ rotateX: Yprime/yukseklik * 180, oldValue: evt.nativeEvent.locationX + ", " + evt.nativeEvent.locationY })
     //this.timer = setTimeout(this.changeDirection(evt), 200);
   }
 
   render() {
     // TODO: find a way to rotate the shape while pressing
+    // TODO2: ilk baktigi yerin noktasi'ni ikinci tikladigi noktanin degerinden cikar, 
+    // bu sana karsi duvari vercek. karsi/hipotenus yap,  
     return (
       <TouchableOpacity style={styles.container} onPressIn={(evt) => this.changeDirection(evt)} onPressOut={(evt) => this.changeDirection(evt)}>
         {/*<Animated.View style={[styles.animationView,
@@ -91,9 +95,9 @@ export default class App extends Component {
           ]}>
         </Animated.View>
 
-        {/*<TouchableOpacity onPress={this._increaseWidth}>
-          <Text style={styles.welcome}>Animate</Text>
-        </TouchableOpacity>*/}
+        <TouchableOpacity onPress={this._increaseWidth}>
+          <Text style={styles.welcome}>{this.state.oldValue}</Text>
+        </TouchableOpacity>
 
 
       </TouchableOpacity>
