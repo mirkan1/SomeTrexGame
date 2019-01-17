@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions, Easing, TouchableWithoutFeedback } from 'react-native';
-import { Constants } from 'expo';
 
 // DID SOME ANIMATION STUFF TO LEARN HOW TO ANIMATE
 // NEXT STEP: MAKE A GAME XD
@@ -17,6 +16,7 @@ export default class App extends PureComponent {
 
     this.state = {
       enemyWidth: new Animated.Value(30),
+      anan: 1,
     };
     this.timer = null;
     this.stopFunction = this.stopFunction.bind(this);
@@ -165,13 +165,13 @@ export default class App extends PureComponent {
         <View> 
           {this.displayEnemy}
         </View>
-        <TouchableOpacity style={styles.container} onPress={(evt) => {this.changeDirection(evt)}}>        
-        
           <Animated.View style={[styles.animationView,
             { width: this.state.width },
             { transform:[ { rotateZ: (this.state.anan) + 'deg' }] }
             ]}>
           </Animated.View>
+        <TouchableOpacity style={styles.container} onPress={(evt) => {this.changeDirection(evt)}}>        
+        
         </TouchableOpacity>
       </Animated.View>
     );
