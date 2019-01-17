@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
+import React, { PureComponent } from 'react';
 import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions, Easing, TouchableWithoutFeedback } from 'react-native';
+import { Constants } from 'expo';
 
 // DID SOME ANIMATION STUFF TO LEARN HOW TO ANIMATE
 // NEXT STEP: MAKE A GAME XD
@@ -7,11 +8,12 @@ import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions
 // https://www.khanacademy.org/partner-content/pixar/sets/rotation/e/rotating-a-point-around-the-origin-2
 // learn trigonometri on graphs better
 
-export default class App extends Component {
+export default class App extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.displayData = [];
+    this.displayBullet = [];
+    this.displayEnemy= [];
 
     this.state = {
       fadeValue: new Animated.Value(0),
@@ -22,37 +24,85 @@ export default class App extends Component {
     this.stopFunction = this.stopFunction.bind(this);
   }
 
+
   TwoFunctions = () => {
     this._moveAnimation();
     this._increaseWidth();
   }
 
-  _moveAnimation = () => {
-    Animated.timing(this.state.fadeValue, {
-      toValue: 1,
-      duration: 1200,
-    }).start(() => {
-        Animated.timing(this.state.fadeValue, {
-        toValue: 0,
-        duration: 1200,
-      }).start(() => {
-        this._moveAnimation();
-      });
-    });
+  getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
   }
-
-  _increaseWidth = () => {
-    Animated.timing(this.state.width, {
-      toValue: 10,
-      duration: 1000,
-    }).start(() => {
-        Animated.timing(this.state.width, {
-          toValue: 100,
+  return color;
+  }
+  
+  
+  _increaseWidth = (myWidth, topMargin, leftMargin, Xprime, Yprime, key) => {
+    let ar = [() => {
+        Animated.timing(myWidth, {
+          toValue: 0,
           duration: 1000,
         }).start(() => {
-          this._increaseWidth();
+          Animated.timing(myWidth, {
+            toValue: 100,
+            duration: 1000,
+          }).start(() => {
+            Animated.timing(myWidth, {
+            toValue: 0,
+            duration: 1000,
+            }).start();
+          });
         });
+      }]
+
+    Animated.parallel([
+      Animated.timing(myWidth, {
+      toValue: 20,
+      duration: 1000,
+    }).start(),
+      
+      Animated.timing(topMargin, {
+        toValue: Xprime - 5,
+        duration: 1000,
+      }).start(),
+
+      Animated.timing(leftMargin, {
+        toValue: Yprime - 5,
+        duration: 1000,
+      }).start()
+
+    ]).start();
+
+    Animated.timing(myWidth, {
+      toValue: 0,
+      duration: 15000,
+    }).start(() => {
+      this.displayBullet[key] = null;
+      this._disappear()
     });
+
+    //this.displayBullet[key] = null
+    
+  }
+
+  sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  _disappear = () => {
+    // deletes last element after its function done
+    // should improve performence
+    // console.log(this.displayBullet);
+    
+      this.sleep(5000).then(() => {
+        if (this.displayBullet[this.displayBullet.length-2] === null) {
+          this.displayBullet = [];
+          //this.displayBullet.length = this.displayBullet.length - 1;
+        }
+      });
   }
 
   stopFunction() {
@@ -60,42 +110,77 @@ export default class App extends Component {
   }
 
   changeDirection = (evt) => {
-    /*let locX = evt.nativeEvent.locationX;
-    let locY = evt.nativeEvent.locationY;
-    let endpoint = Math.atan(locY / locX)
-    console.log(`locX: ${locX}, locY: ${locY}`)*/
-    let FRONT =  [Dimensions.get('window').height / 2, Dimensions.get('window').width / 2];
-    console.log(this.displayData) // 187.5, 333.5
-    let X = 400;
-    let Y = 200;
+    let FRONT = [Dimensions.get('window').height / 2, Dimensions.get('window').width / 2];
+    //console.log(this.displayBullet) // 187.5, 333.5
     let Yprime = evt.nativeEvent.locationX;
     let Xprime = evt.nativeEvent.locationY;
-    let result1 = (FRONT[1] - Yprime) / (FRONT[0] - Xprime);
-    let result = Xprime < FRONT[1] ? -(Math.atan(result1)) * 180 / 3.14 + 180 : -(Math.atan(result1)) * 180 / 3.14;
+    let toa = (FRONT[1] - Yprime) / (FRONT[0] - Xprime);
+    let result = Xprime < FRONT[1] ? -(Math.atan(toa)) * 180 / 3.14 + 180 : -(Math.atan(toa)) * 180 / 3.14;
 
-    this.setState({ anan: result, oldValue: [Xprime, Yprime] });
+    this.setState({ anan: result});
     
-    this.displayData.push(<View style={{backgroundColor: "black", width:10, height:10, position: "absolute", marginTop: Xprime, marginLeft: Yprime}}></View>);
-    this.setState({
-      showdata : this.displayData
-    });
+    let myWidth =  new Animated.Value(20);
+    let marginIt = new Animated.Value(Xprime);
 
-    //var view = React.createElement(View, [{style: {backgroundColor:"blue", width: 100, height: 100}}], 'hello');
+    let topMargin = new Animated.Value(FRONT[0]); 
+    let leftMargin = new Animated.Value(FRONT[1]);
+
+    this.displayBullet.push(
+      <Animated.View 
+        style={{
+          backgroundColor: this.getRandomColor(),
+          width: myWidth,
+          height: myWidth,
+          position: "absolute", 
+          marginTop: topMargin, 
+          marginLeft: leftMargin,
+        }}
+        key={this.displayBullet.length}
+        onPress={this._increaseWidth(myWidth, topMargin, leftMargin, Xprime, Yprime, this.displayBullet.length-1)}
+        ref={[Xprime, Yprime]}
+      >
+      </Animated.View>
+    );
+  }
+
+  createEnemy = () => {
+    if (this.displayEnemy.length === 0) {
+      this.displayEnemy.push(
+        <Animated.View 
+          style={{
+            backgroundColor: 'black',
+            width: 30,
+            height: 30,
+            position: "absolute", 
+            marginTop: Math.random() * Dimensions.get('window').height - 10, 
+            marginLeft: Math.random() * Dimensions.get('window').width - 10,
+            borderRadius: 100/2,
+          }}
+          key={this.displayEnemy.length}
+        >
+        </Animated.View>
+      );
+    }
   }
 
   render() {
-    // TODO: find a way to rotate the shape while pressing
-    // TODO2: ilk baktigi yerin noktasi'ni ikinci tikladigi noktanin degerinden cikar, 
-    // bu sana karsi duvari vercek. karsi/hipotenus yap
-    // center is around (200,400)
-    // WATAFAAAAK
+    this.displayEnemy.length > 0 
+      ? 
+      Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginTop - this.displayBullet[this.displayBullet.length-1].ref[0]) <= 30 && Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginLeft - this.displayBullet[this.displayBullet.length-1].ref[1]) <= 30
+        ? this.displayEnemy = []
+        : null
+      : null;
     return (
-      <TouchableOpacity style={styles.container} onPress={(evt) => this.changeDirection(evt)}>
+      <TouchableOpacity style={styles.container} onPress={(evt) => {this.changeDirection(evt), this.createEnemy()}}>
 
         <View>
-          {this.displayData}
+          {this.displayBullet}
         </View>
-      
+
+        <View>
+          {this.displayEnemy}
+        </View>
+       
         <Animated.View style={[styles.animationView,
           { width: this.state.width },
           { transform:[ { rotateZ: (this.state.anan) + 'deg' }] }
@@ -137,6 +222,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 50,
     borderTopWidth: 50,
     borderTopColor: 'red',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: 'transparent',
     alignSelf: 'center',
     position: "absolute",
     marginTop: Dimensions.get('window').height / 2 - 100,
