@@ -16,21 +16,13 @@ export default class App extends PureComponent {
     this.displayEnemy= [];
 
     this.state = {
-      fadeValue: new Animated.Value(0),
-      width: new Animated.Value(100),
-      oldValue: [1, 1],
+      enemyWidth: new Animated.Value(30),
     };
     this.timer = null;
     this.stopFunction = this.stopFunction.bind(this);
   }
 
-
-  TwoFunctions = () => {
-    this._moveAnimation();
-    this._increaseWidth();
-  }
-
-  getRandomColor() {
+  getRandomColor = () => {
   var letters = '0123456789ABCDEF';
   var color = '#';
   for (var i = 0; i < 6; i++) {
@@ -41,23 +33,7 @@ export default class App extends PureComponent {
   
   
   _increaseWidth = (myWidth, topMargin, leftMargin, Xprime, Yprime, key) => {
-    let ar = [() => {
-        Animated.timing(myWidth, {
-          toValue: 0,
-          duration: 1000,
-        }).start(() => {
-          Animated.timing(myWidth, {
-            toValue: 100,
-            duration: 1000,
-          }).start(() => {
-            Animated.timing(myWidth, {
-            toValue: 0,
-            duration: 1000,
-            }).start();
-          });
-        });
-      }]
-
+    console.log(this.state.enemyWidth)
     Animated.parallel([
       Animated.timing(myWidth, {
       toValue: 20,
@@ -72,8 +48,22 @@ export default class App extends PureComponent {
       Animated.timing(leftMargin, {
         toValue: Yprime - 5,
         duration: 1000,
-      }).start()
-
+      }).start(() => {
+        this.displayEnemy.length > 0 
+      ? 
+      Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginTop - this.displayBullet[this.displayBullet.length-1].ref[0]) <= 30 && Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginLeft - this.displayBullet[this.displayBullet.length-1].ref[1]) <= 30
+        ? (
+            Animated.timing(this.state.enemyWidth, { 
+              toValue: 0,
+              easing: Easing.elastic(2), 
+              duration: 1000,
+            }).start(() => {
+              this.displayEnemy = [];
+            })
+          )
+        : null
+      : null;
+      })
     ]).start();
 
     Animated.timing(myWidth, {
@@ -83,20 +73,22 @@ export default class App extends PureComponent {
       this.displayBullet[key] = null;
       this._disappear()
     });
-
-    //this.displayBullet[key] = null
     
   }
 
-  sleep(ms) {
+  killEnemy = (enemyWidth) => {
+    Animated.timing(enemyWidth, {
+      toValue: 0,
+      duration: 1000,
+    }).start();
+  }
+  sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   _disappear = () => {
     // deletes last element after its function done
     // should improve performence
-    // console.log(this.displayBullet);
-    
       this.sleep(5000).then(() => {
         if (this.displayBullet[this.displayBullet.length-2] === null) {
           this.displayBullet = [];
@@ -105,7 +97,7 @@ export default class App extends PureComponent {
       });
   }
 
-  stopFunction() {
+  stopFunction = () => {
     clearTimeout(this.timer);
   }
 
@@ -125,6 +117,24 @@ export default class App extends PureComponent {
     let topMargin = new Animated.Value(FRONT[0]); 
     let leftMargin = new Animated.Value(FRONT[1]);
 
+    if (this.displayEnemy.length < 1) {
+      this.state.enemyWidth.setValue(30);
+      this.displayEnemy.push(
+        <Animated.View 
+          style={{
+            backgroundColor: 'black',
+            width: this.state.enemyWidth,
+            height: this.state.enemyWidth,
+            position: "absolute", 
+            marginTop: Math.random() * Dimensions.get('window').height - 30, 
+            marginLeft: Math.random() * Dimensions.get('window').width - 30,
+          }}
+          key={this.displayEnemy.length}
+        >
+        </Animated.View>
+      );
+    }
+
     this.displayBullet.push(
       <Animated.View 
         style={{
@@ -134,6 +144,7 @@ export default class App extends PureComponent {
           position: "absolute", 
           marginTop: topMargin, 
           marginLeft: leftMargin,
+          borderRadius: 100/2,
         }}
         key={this.displayBullet.length}
         onPress={this._increaseWidth(myWidth, topMargin, leftMargin, Xprime, Yprime, this.displayBullet.length-1)}
@@ -143,57 +154,26 @@ export default class App extends PureComponent {
     );
   }
 
-  createEnemy = () => {
-    if (this.displayEnemy.length === 0) {
-      this.displayEnemy.push(
-        <Animated.View 
-          style={{
-            backgroundColor: 'black',
-            width: 30,
-            height: 30,
-            position: "absolute", 
-            marginTop: Math.random() * Dimensions.get('window').height - 10, 
-            marginLeft: Math.random() * Dimensions.get('window').width - 10,
-            borderRadius: 100/2,
-          }}
-          key={this.displayEnemy.length}
-        >
-        </Animated.View>
-      );
-    }
-  }
-
   render() {
-    this.displayEnemy.length > 0 
-      ? 
-      Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginTop - this.displayBullet[this.displayBullet.length-1].ref[0]) <= 30 && Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginLeft - this.displayBullet[this.displayBullet.length-1].ref[1]) <= 30
-        ? this.displayEnemy = []
-        : null
-      : null;
+    console.log(this.displayEnemy)
     return (
-      <TouchableOpacity style={styles.container} onPress={(evt) => {this.changeDirection(evt), this.createEnemy()}}>
-
+      <Animated.View style={styles.container}>
         <View>
           {this.displayBullet}
         </View>
 
-        <View>
+        <View> 
           {this.displayEnemy}
         </View>
-       
-        <Animated.View style={[styles.animationView,
-          { width: this.state.width },
-          { transform:[ { rotateZ: (this.state.anan) + 'deg' }] }
-          ]}>
-        </Animated.View>
-
-        {/*
-        <View onPress={this._increaseWidth}>
-          <Text style={styles.welcome}>{this.state.oldValue[0]}-{this.state.oldValue[1]}</Text>
-        </View>
-        */}
-
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.container} onPress={(evt) => {this.changeDirection(evt)}}>        
+        
+          <Animated.View style={[styles.animationView,
+            { width: this.state.width },
+            { transform:[ { rotateZ: (this.state.anan) + 'deg' }] }
+            ]}>
+          </Animated.View>
+        </TouchableOpacity>
+      </Animated.View>
     );
   }
 }
