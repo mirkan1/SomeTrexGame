@@ -119,6 +119,8 @@ export default class App extends PureComponent {
 
     if (this.displayEnemy.length < 1) {
       this.state.enemyWidth.setValue(30);
+      // do not delete it
+      // make it move to new location
       this.displayEnemy.push(
         <Animated.View 
           style={{
