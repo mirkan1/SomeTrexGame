@@ -3,6 +3,11 @@ import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions
 import { Constants } from 'expo';
 import Menu from './Menu';
 
+// OYUNUN MANTIGI
+// Bir obje var bu objeye vurdugun zaman yer degýstýrýyor. 
+// Eger ýskalarsan yanýyorsun ve bastan baslamak zorunda kalýyorsun.
+// Ana karakter Trex
+
 export default class App extends PureComponent {
   constructor(props) {
     super(props);
@@ -13,21 +18,21 @@ export default class App extends PureComponent {
     this.state = {
       enemyWidth: new Animated.Value(30),
       anan: 1,
-      enemyMarginTop: new Animated.Value(Math.random() * Dimensions.get('window').height - 30,),
-      enemyMarginLeft: new Animated.Value(Math.random() * Dimensions.get('window').width - 30,),
+      enemyMarginTop: new Animated.Value(Math.random() * Dimensions.get('window').height - 30),
+      enemyMarginLeft: new Animated.Value(Math.random() * Dimensions.get('window').width - 30),
       count: 0,
     };
+
     this.timer = null;
-    this.stopFunction = this.stopFunction.bind(this);
   }
 
   getRandomColor = () => {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   }
   
   
@@ -41,7 +46,7 @@ export default class App extends PureComponent {
       Animated.timing(topMargin, {
         toValue: Xprime - 5,
         duration: 1000,
-      }).start(), 
+      }).start(),
 
       Animated.timing(leftMargin, {
         toValue: Yprime - 5,
@@ -50,9 +55,6 @@ export default class App extends PureComponent {
         let enemyMarginTop = JSON.stringify(this.displayEnemy[this.displayEnemy.length-1].props.style.marginTop) // diger turly {object object} diyor hata veriyor
         let enemyMarginLeft = JSON.stringify(this.displayEnemy[this.displayEnemy.length-1].props.style.marginLeft) // diger turly {object object} diyor hata veriyor
         let bullet = this.displayBullet[this.displayBullet.length-1].ref[0];
-        // enemy yi inte donusturemiyom mogu
-        console.log(this.displayEnemy[this.displayEnemy.length-1].props.style.marginLeft + 560);
-        //console.log(this.displayEnemy[this.displayEnemy.length-1].props.style.marginTop - this.displayBullet[this.displayBullet.length-1].ref[0], Math.abs(this.displayEnemy[this.displayEnemy.length-1].props.style.marginTop - this.displayBullet[this.displayBullet.length-1].ref[0]) <= 30 );
         this.displayEnemy.length > 0 
       ? 
       Math.abs(enemyMarginTop - this.displayBullet[this.displayBullet.length-1].ref[0]) <= 30 && Math.abs(enemyMarginLeft - this.displayBullet[this.displayBullet.length-1].ref[1]) <= 30
@@ -101,23 +103,18 @@ export default class App extends PureComponent {
       duration: 1000,
     }).start();
   }
+  
   sleep = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   _disappear = () => {
     // deletes last element after its function done
     // should improve performence
-      this.sleep(5000).then(() => {
-        if (this.displayBullet[this.displayBullet.length-2] === null) {
-          this.displayBullet = [];
-          //this.displayBullet.length = this.displayBullet.length - 1;
-        }
-      });
-  }
-
-  stopFunction = () => {
-    clearTimeout(this.timer);
+    if (this.displayBullet[this.displayBullet.length-2] === null) {
+      this.displayBullet = [];
+      //this.displayBullet.length = this.displayBullet.length - 1;
+    }
   }
 
   changeDirection = (evt) => {
@@ -125,9 +122,9 @@ export default class App extends PureComponent {
     let Yprime = evt.nativeEvent.locationX;
     let Xprime = evt.nativeEvent.locationY;
     let toa = (FRONT[1] - Yprime) / (FRONT[0] - Xprime);
-    let result = Xprime < FRONT[1] ? -(Math.atan(toa)) * 180 / 3.14 + 180 : -(Math.atan(toa)) * 180 / 3.14;
+    let result = Xprime < FRONT[1] ? -(Math.atan(toa)) * 180 / Math.PI + 180 : -(Math.atan(toa)) * 180 / Math.PI;
 
-    this.setState({ anan: result});
+    this.setState({ anan: result });
     
     let myWidth =  new Animated.Value(20);
     let marginIt = new Animated.Value(Xprime);
@@ -176,7 +173,7 @@ export default class App extends PureComponent {
 
   render() {
     return (
-      <Menu style={styles.container}>
+      <Menu style={styles.container} buttonStyle={styles.button}>
         <View>
           {this.displayBullet}
         </View>
@@ -187,8 +184,7 @@ export default class App extends PureComponent {
           <Animated.View style={[styles.animationView,
             { width: this.state.width },
             { transform:[ { rotateZ: (this.state.anan) + 'deg' }] }
-            ]}>
-            
+          ]}>
           </Animated.View>
         <TouchableOpacity style={styles.container} onPress={(evt) => {this.changeDirection(evt)}}>        
         

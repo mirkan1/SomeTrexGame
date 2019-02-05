@@ -21,21 +21,28 @@ class Menu extends Component {
           marginTop: Dimensions.get('window').height / 2 - 150,
           marginLeft: Dimensions.get('window').width / 2 - 100,
           backgroundColor: 'pink',
-
         }}>
           <TouchableOpacity 
 			      onPress={() => this.setState({menuOpacity: !this.state.menuOpacity})}
-			      style={{backgroundColor: "blue"}}
+			      style={this.props.buttonStyle}
 		      >
             <Text>Play</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
 			      onPress={() => this.setState({menuOpacity: !this.state.menuOpacity})}
-			      style={{backgroundColor: "blue"}}
+			      style={this.props.buttonStyle}
 		      >
             <Text>Restart(make it work)</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+			      onPress={() => this.setState({menuOpacity: !this.state.menuOpacity})}
+			      style={this.props.buttonStyle}
+		      >
+            <Text>Options(make it work)</Text>
+          </TouchableOpacity>
+
         </View>
 
       </Animated.View>
