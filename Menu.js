@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import {Platform, StyleSheet, Text, View, Animated, TouchableOpacity, Dimensions, Easing, TouchableWithoutFeedback } from 'react-native';
-import { Constants } from 'expo';
+//import { Constants } from 'expo';
+
+const WINDOW = Dimensions.get('window');
 
 class Menu extends Component {
   constructor(props) {
     super(props);
     this.state = { menuOpacity: true }
-  };
+  }
+
   render() {
     if (this.state.menuOpacity) { 
   return (
@@ -14,12 +17,12 @@ class Menu extends Component {
         {this.props.children}
 
         <View style={{
-          width: Dimensions.get('window').width / 2,
-          height: Dimensions.get('window').height / 2,
+          width: WINDOW.width / 2,
+          height: WINDOW.height / 2,
           alignSelf: 'center',
           position: "absolute",
-          marginTop: Dimensions.get('window').height / 2 - 150,
-          marginLeft: Dimensions.get('window').width / 2 - 100,
+          marginTop: WINDOW.height / 2 - 150,
+          marginLeft: WINDOW.width / 2 - 100,
           backgroundColor: 'pink',
         }}>
           <TouchableOpacity 
@@ -49,18 +52,28 @@ class Menu extends Component {
   );
     } else {
       return ( 
-        <Animated.View style={this.props.style}>
+        <View style={this.props.style}>
           {this.props.children}
           <TouchableOpacity 
 			      onPress={() => this.setState({menuOpacity: !this.state.menuOpacity})}
-			      style={{backgroundColor: "blue", alignSelf: 'auto',}}
+			      style={{backgroundColor: "pink", alignSelf: 'flex-end', position: "absolute", width: "100%", height: 1, paddingTop: 1}}
 		      >
-            <Text>Open Menu</Text>
+            <Text style={styles.closedMenu}>Open Menu</Text>
+            <Text style={styles.closedMenu}>SCORE:{this.props.score}</Text>
           </TouchableOpacity>
-        </Animated.View>
+        </View>
       );
     }
   }
 }
+
+const styles = StyleSheet.create({
+  closedMenu: {
+    fontSize: 15, 
+    letterSpacing: 5, 
+    textAlign: 'center',
+  }
+})
+
 
 export default Menu;
